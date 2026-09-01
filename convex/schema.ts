@@ -34,6 +34,18 @@ export default defineSchema({
       v.object({ key: v.string(), label: v.string(), value: v.string() }),
     ),
     createdAt: v.number(),
+    /** Outbound webhook delivery state. Optional: rows predate the webhook. */
+    webhookStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("sent"),
+        v.literal("failed"),
+        v.literal("skipped"),
+      ),
+    ),
+    webhookAttempts: v.optional(v.number()),
+    webhookError: v.optional(v.string()),
+    webhookSentAt: v.optional(v.number()),
   })
     .index("by_token", ["token"])
     .index("by_link", ["linkId"])

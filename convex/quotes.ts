@@ -12,6 +12,7 @@ import {
   type Errors,
 } from "../lib/quoteSpec";
 import { isValidSession, requireAdmin } from "./lib/auth";
+import { internal } from "./_generated/api";
 
 /** Ambiguous characters (0/O, 1/I) are left out so tokens survive being read aloud. */
 const TOKEN_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -207,7 +208,7 @@ export const submitQuote = mutation({
     const createdAt = Date.now();
     const reference = referenceFor(createdAt);
 
-    await ctx.db.insert("quotes", {
+    const quoteId = await ctx.db.insert("quotes", {
       linkId: link._id,
       token: link.token,
       reference,
@@ -218,11 +219,21 @@ export const submitQuote = mutation({
       quantity: Number(trim(args.answers.quantity)),
       answers: buildAnswerRows(productType, args.answers),
       createdAt,
+      webhookStatus: "pending",
+      webhookAttempts: 0,
     });
 
     await ctx.db.patch(link._id, {
       submissionCount: link.submissionCount + 1,
       lastSubmittedAt: createdAt,
+    });
+
+    // Fire-and-forget: the customer's submit must not wait on, or fail
+    // because of, the receiving system. Scheduled work only runs if this
+    // mutation commits, so a rejected submission never sends a webhook.
+    await ctx.scheduler.runAfter(0, internal.notify.deliverQuoteWebhook, {
+      quoteId,
+      attempt: 1,
     });
 
     return { reference };
@@ -292,6 +303,15 @@ export const listQuotes = query({
         v.object({ key: v.string(), label: v.string(), value: v.string() }),
       ),
       createdAt: v.number(),
+      webhookStatus: v.optional(
+        v.union(
+          v.literal("pending"),
+          v.literal("sent"),
+          v.literal("failed"),
+          v.literal("skipped"),
+        ),
+      ),
+      webhookError: v.optional(v.string()),
     }),
     ),
   ),
@@ -309,6 +329,8 @@ export const listQuotes = query({
       quantity: quote.quantity,
       answers: quote.answers,
       createdAt: quote.createdAt,
+      webhookStatus: quote.webhookStatus,
+      webhookError: quote.webhookError,
     }));
   },
 });

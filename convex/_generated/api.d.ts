@@ -11,6 +11,7 @@
 import type * as admin from "../admin.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as notify from "../notify.js";
 import type * as quotes from "../quotes.js";
 
 import type {
@@ -23,6 +24,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   http: typeof http;
   "lib/auth": typeof lib_auth;
+  notify: typeof notify;
   quotes: typeof quotes;
 }>;
 
