@@ -5,7 +5,6 @@ import {
   internalQuery,
 } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { buildFormPath } from "../lib/prefill";
 import { DEFAULT_TIMEZONE, buildWhatsAppMessage } from "../lib/quoteMessage";
 
 /**
@@ -29,12 +28,7 @@ const REQUEST_TIMEOUT_MS = 10_000;
 
 export const quoteForWebhook = internalQuery({
   args: { quoteId: v.id("quotes") },
-  handler: async (ctx, args) => {
-    const quote = await ctx.db.get(args.quoteId);
-    if (!quote) return null;
-    const link = await ctx.db.get(quote.linkId);
-    return { quote, notes: link?.notes };
-  },
+  handler: async (ctx, args) => ctx.db.get(args.quoteId),
 });
 
 export const markWebhookResult = internalMutation({
@@ -77,47 +71,18 @@ export const deliverQuoteWebhook = internalAction({
       return null;
     }
 
-    const loaded = await ctx.runQuery(internal.notify.quoteForWebhook, {
+    const quote = await ctx.runQuery(internal.notify.quoteForWebhook, {
       quoteId: args.quoteId,
     });
-    if (!loaded) return null; // Submission was deleted before we got to it.
-    const { quote, notes } = loaded;
+    if (!quote) return null; // Submission was deleted before we got to it.
 
-    const base = process.env.APP_BASE_URL?.replace(/\/+$/, "");
-    const path = buildFormPath(quote.token, {
-      customerName: quote.customerName,
-      phone: quote.phone,
-      email: quote.email,
-      quantity: String(quote.quantity),
-    });
-
+    // The summary and nothing else. Still wrapped in JSON under `message` so
+    // receivers keep parsing a JSON body rather than plain text.
     const payload = {
-      event: "quote.submitted",
-      // Ready to forward straight to WhatsApp — the structured fields below
-      // are kept for anything that needs to read individual values.
       message: buildWhatsAppMessage(
         quote,
         process.env.QUOTE_TIMEZONE || DEFAULT_TIMEZONE,
       ),
-      reference: quote.reference,
-      submittedAt: new Date(quote.createdAt).toISOString(),
-      customer: {
-        name: quote.customerName,
-        phone: quote.phone,
-        email: quote.email ?? null,
-      },
-      productType: quote.productType,
-      quantity: quote.quantity,
-      answers: quote.answers,
-      // Flat label -> value map, easier to bind to in no-code tools.
-      answersByLabel: Object.fromEntries(
-        quote.answers.map((answer) => [answer.label, answer.value]),
-      ),
-      link: {
-        token: quote.token,
-        url: base ? `${base}${path}` : null,
-        internalNote: notes ?? null,
-      },
     };
 
     const headers: Record<string, string> = {
