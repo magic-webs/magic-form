@@ -217,6 +217,58 @@ Send `url` to the customer.
   **not** rate limited — it is expected to be long and random.
 - Valid product names are the keys of `PRODUCTS` in `lib/quoteSpec.ts`.
 
+## Webhook on submit
+
+Every submitted specification is POSTed to an external endpoint — set it with:
+
+```bash
+npx convex env set QUOTE_WEBHOOK_URL "https://..."
+npx convex env set QUOTE_WEBHOOK_SECRET "..."      # optional, sent as x-webhook-secret
+npx convex env set QUOTE_TIMEZONE "Asia/Kolkata"   # optional, dates in the message
+```
+
+A Convex mutation cannot make network calls, so `submitQuote` schedules the
+action in `convex/notify.ts` instead. That is also the right behaviour for the
+customer: their submit never waits on, or fails because of, the receiving
+system. Scheduled work only runs if the mutation commits, so a rejected
+submission never fires a webhook.
+
+### Payload
+
+`message` is the headline field: a WhatsApp-ready summary built by
+`lib/quoteMessage.ts`, using `*bold*` markup. The structured fields are kept
+alongside it for anything that needs individual values.
+
+```json
+{
+  "event": "quote.submitted",
+  "message": "*New Quote Request*
+
+*Reference:* PW-20260901-B6RQ
+...",
+  "reference": "PW-20260901-B6RQ",
+  "submittedAt": "2026-09-01T14:30:00.000Z",
+  "customer": { "name": "...", "phone": "...", "email": null },
+  "productType": "Booklet",
+  "quantity": 500,
+  "answers": [{ "key": "...", "label": "...", "value": "..." }],
+  "answersByLabel": { "Ink": "Colour throughout" },
+  "link": { "token": "...", "url": "...", "internalNote": null }
+}
+```
+
+The message deliberately leaves out the internal note and the form URL, on the
+assumption it may be forwarded to the customer. Both remain in `link` for
+internal use.
+
+### Delivery and retries
+
+Up to 3 attempts, backing off 10s then 60s, each with a 10s timeout. Anything
+outside 2xx counts as a failure. The outcome is recorded on the quote
+(`webhookStatus`, `webhookAttempts`, `webhookError`), and the dashboard shows a
+**Webhook failed** badge with the error, so a lost notification is visible
+rather than silent. With no URL configured, delivery is marked `skipped`.
+
 ## Data model (`convex/schema.ts`)
 
 - **`quoteLinks`** — one row per issued link: token, customer name, phone, email,
@@ -226,6 +278,9 @@ Send `url` to the customer.
   quote stays readable even if the field spec later changes.
 - **`adminSessions`** / **`adminLoginAttempts`** — sign-in sessions and the
   failed-attempt timestamps behind the throttle. Both are pruned on login.
+
+Quotes also carry `webhookStatus` / `webhookAttempts` / `webhookError` /
+`webhookSentAt`, all optional so rows created before the webhook stay valid.
 
 Tokens are 10 characters from an alphabet with `0/O` and `1/I` removed, so they
 survive being read over the phone.
@@ -250,7 +305,7 @@ npm run dev      # http://localhost:3000
 - The `/f/<token>` form is public by design; the 10-character token is the only
   thing protecting it, which is appropriate for a quote request but not for
   anything confidential.
-- **Set `APP_BASE_URL` and `QUOTE_API_KEY` on prod too** (`npx convex env set
+- **Set `APP_BASE_URL`, `QUOTE_API_KEY` and `QUOTE_WEBHOOK_URL` on prod too** (`npx convex env set
   --prod ...`). Convex environment variables do not carry between deployments,
   and on prod `APP_BASE_URL` must be your real domain or the API will hand out
   localhost links.
