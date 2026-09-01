@@ -49,10 +49,27 @@ Selects and radios both render as large tap targets rather than dropdowns,
 quantity offers preset chips, and the review screen has an **Edit** button per
 answer that jumps to that step and comes straight back.
 
-Mobile specifics: 16px inputs (smaller text makes iOS Safari zoom on focus),
-48px minimum tap targets, a bottom action bar pinned above the home indicator
-via `env(safe-area-inset-bottom)`, and no horizontal scrolling — long URLs
-scroll inside their own box.
+### iOS specifics
+
+Four things are done deliberately to stop mobile Safari zooming:
+
+- **16px inputs.** Safari zooms in on focus when a text field is under 16px.
+- **`touch-action: manipulation`** on buttons, labels, links and the option
+  radios. Without it, two quick taps count as double-tap-to-zoom and the page
+  ends up zoomed after a few option taps. Text inputs are deliberately excluded
+  so double-tap still selects a word.
+- **Option-card radios are full-size and transparent, not `sr-only`.** Safari
+  zooms toward a focused element smaller than the tap area, and a 1×1 clipped
+  radio inside a 56px card triggers exactly that.
+- **`viewportFit: "cover"`** in the root `viewport` export. `env(safe-area-inset-*)`
+  reports 0 without it, which would leave the bottom bar under the home indicator.
+
+Pinch-to-zoom is left enabled on purpose. `maximum-scale=1` / `user-scalable=no`
+would also stop the zooming, by making the page inaccessible to anyone who needs
+to magnify it.
+
+Also: 48px minimum tap targets, and no horizontal scrolling — long URLs scroll
+inside their own box.
 
 ## Validation
 
@@ -80,6 +97,18 @@ On the customer wizard, errors appear when **Next** is pressed and block the
 step until fixed. On the staff dashboard they appear per field on blur. In both
 cases server-side failures come back as a `ConvexError` carrying per-field
 messages, which the UI maps onto the same inputs.
+
+## Reading submissions
+
+Submitted specifications are visible only on the password-gated dashboard, and
+`listQuotes` refuses to return anything without a valid session — the gate is
+server-side, not just a hidden UI section.
+
+The list has a free-text search (name, phone, email, reference, product and any
+answer value) plus a product dropdown that only offers products that actually
+have submissions. Matching lives in `lib/quoteFilter.ts` so it can be tested on
+its own. Filtering happens in the browser over the 100 most recent rows that
+`listQuotes` returns; past that it would need to move into the query.
 
 ## Admin password
 
