@@ -235,32 +235,33 @@ submission never fires a webhook.
 
 ### Payload
 
-The body is the summary and nothing else — a WhatsApp-ready message built by
-`lib/quoteMessage.ts` using `*bold*` markup:
+The body is the summary and nothing else. The text is written *to the
+customer* - a receipt-style confirmation with a read-back of their spec, built
+by `lib/quoteMessage.ts` using `*bold*` markup:
 
 ```json
 {
-  "message": "*New Quote Request*
+  "message": "Thanks for your quote request. We have got it and will come back to you shortly with a price.
 
-*Reference:* PW-20260901-QLF5
+*Your reference:* PW-20260901-2CWY
 *Received:* 01 Sept 2026, 14:30
 
-*Customer*
-• Name: ...
-
-*Job*
-• Product: Booklet
-• Quantity: 500
+*What you asked for*
 ..."
 }
 ```
 
-It stays wrapped in JSON under `message` rather than being sent as plain text,
-so receivers keep parsing a JSON body. `content-type` is `application/json`,
-and `x-webhook-secret` is added when `QUOTE_WEBHOOK_SECRET` is set.
+It stays wrapped in JSON under `message` rather than sent as plain text, so
+receivers keep parsing a JSON body. `content-type` is `application/json`, and
+`x-webhook-secret` is added when `QUOTE_WEBHOOK_SECRET` is set.
 
-The message deliberately omits the internal note and the form URL, on the
-assumption it may be forwarded to the customer.
+There is deliberately no greeting or sign-off - the sending channel supplies
+those - and no recipient field, so **the receiving automation has to know who
+the message goes to**. Nothing internal appears in the text either: no staff
+note, no form URL, no token, and the customer's own phone and email are not
+read back at them.
+
+Dates in the message follow `QUOTE_TIMEZONE`, defaulting to `Europe/London`.
 
 ### Delivery and retries
 
