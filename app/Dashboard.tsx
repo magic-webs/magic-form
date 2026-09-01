@@ -539,9 +539,19 @@ export function Dashboard({
                     Qty {quote.quantity.toLocaleString("en-GB")}
                   </span>
                 </span>
-                <span className="mt-1 flex flex-wrap items-center gap-x-3 text-xs text-zinc-500">
+                <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
                   <span className="font-mono">{quote.reference}</span>
                   <span>{formatDate(quote.createdAt)}</span>
+                  {quote.webhookStatus === "failed" && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 font-semibold text-red-700">
+                      Webhook failed
+                    </span>
+                  )}
+                  {quote.webhookStatus === "pending" && (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-800">
+                      Webhook sending
+                    </span>
+                  )}
                 </span>
               </summary>
               <dl className="mt-4 space-y-2 border-t border-zinc-200 pt-4 text-sm sm:grid sm:grid-cols-2 sm:gap-x-6 sm:space-y-0 sm:gap-y-2">
@@ -561,6 +571,14 @@ export function Dashboard({
                     <dd className="font-medium break-words">{answer.value}</dd>
                   </div>
                 ))}
+                {quote.webhookStatus === "failed" && quote.webhookError && (
+                  <div className="flex gap-2 sm:col-span-2">
+                    <dt className="shrink-0 text-red-600">Webhook error</dt>
+                    <dd className="font-medium break-words text-red-700">
+                      {quote.webhookError}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </details>
           ))}
