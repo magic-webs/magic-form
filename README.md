@@ -235,15 +235,17 @@ submission never fires a webhook.
 
 ### Payload
 
-The body is the summary and nothing else. The text is written *to the
-customer* - a receipt-style confirmation with a read-back of their spec, built
-by `lib/quoteMessage.ts` using `*bold*` markup:
+The customer's number plus the summary. The text is written *to the customer* -
+a receipt-style confirmation with a read-back of their spec, built by
+`lib/quoteMessage.ts` using `*bold*` markup:
 
 ```json
 {
+  "phone": "+44 7700 900123",
+  "phoneDigits": "447700900123",
   "message": "Thanks for your quote request. We have got it and will come back to you shortly with a price.
 
-*Your reference:* PW-20260901-2CWY
+*Your reference:* PW-20260901-MLLB
 *Received:* 01 Sept 2026, 14:30
 
 *What you asked for*
@@ -251,15 +253,19 @@ by `lib/quoteMessage.ts` using `*bold*` markup:
 }
 ```
 
-It stays wrapped in JSON under `message` rather than sent as plain text, so
-receivers keep parsing a JSON body. `content-type` is `application/json`, and
-`x-webhook-secret` is added when `QUOTE_WEBHOOK_SECRET` is set.
+`phone` is exactly what the customer typed. `phoneDigits` is the same number
+stripped of spaces and punctuation, for APIs that want bare digits.
 
-There is deliberately no greeting or sign-off - the sending channel supplies
-those - and no recipient field, so **the receiving automation has to know who
-the message goes to**. Nothing internal appears in the text either: no staff
-note, no form URL, no token, and the customer's own phone and email are not
-read back at them.
+**`phoneDigits` carries a country code only if the customer typed one.** The
+form accepts local formats, so `07700900456` stays `07700900456` and
+`(0044) 7700-900123` becomes `00447700900123` - neither will dial on WhatsApp.
+Either prefix a default country code in the receiving automation, or make the
+form require a leading `+`.
+
+`content-type` is `application/json`, and `x-webhook-secret` is added when
+`QUOTE_WEBHOOK_SECRET` is set. Nothing internal appears in the message: no
+staff note, no form URL, no token, and the customer's own phone and email are
+not read back at them inside the text.
 
 Dates in the message follow `QUOTE_TIMEZONE`, defaulting to `Europe/London`.
 
