@@ -136,7 +136,8 @@ export function OptionCard({
   return (
     <label
       className={cn(
-        "flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-base transition active:scale-[0.995]",
+        "relative flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-base transition active:scale-[0.995]",
+        "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-zinc-900 has-[:focus-visible]:ring-offset-2",
         selected
           ? "border-zinc-900 bg-zinc-900/[0.04] ring-2 ring-zinc-900"
           : invalid
@@ -144,13 +145,17 @@ export function OptionCard({
             : "border-zinc-300 hover:border-zinc-400 hover:bg-zinc-50",
       )}
     >
+      {/*
+        Transparent but full size, rather than visually hidden at 1x1: iOS
+        zooms toward a focused element that is smaller than the tap area.
+      */}
       <input
         type="radio"
         name={name}
         value={label}
         checked={selected}
         onChange={onSelect}
-        className="sr-only"
+        className="absolute inset-0 m-0 size-full cursor-pointer touch-manipulation appearance-none rounded-xl opacity-0 outline-none"
       />
       <span
         aria-hidden

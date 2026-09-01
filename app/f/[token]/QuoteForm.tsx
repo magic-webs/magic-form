@@ -670,8 +670,11 @@ export function QuoteForm({ token }: { token: string }) {
 
         <nav
           className={cn(
-            "fixed inset-x-0 bottom-0 z-10 flex gap-3 border-t border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur",
+            "fixed inset-x-0 bottom-0 z-10 flex gap-3 border-t border-zinc-200 bg-white/95 py-3 backdrop-blur",
+            // Safe-area insets keep the bar clear of the home indicator, and
+            // of the notch when the phone is held sideways.
             "pb-[max(0.75rem,env(safe-area-inset-bottom))]",
+            "pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
             "sm:static sm:mt-5 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none",
           )}
         >

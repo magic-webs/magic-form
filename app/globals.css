@@ -18,3 +18,21 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/*
+ * iOS Safari treats two quick taps on a control as double-tap-to-zoom, which
+ * leaves the page zoomed in after a few option taps. `manipulation` opts out
+ * of that gesture (and its 300ms tap delay) while leaving pinch-to-zoom alone,
+ * so the page stays accessible. Text inputs are left out on purpose: their
+ * double-tap selects a word.
+ */
+button,
+label,
+select,
+summary,
+a,
+input[type="radio"],
+input[type="checkbox"],
+[role="button"] {
+  touch-action: manipulation;
+}

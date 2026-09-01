@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
@@ -16,6 +16,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Printwell Quote Requests",
   description: "Issue a quote form link and collect print specifications.",
+};
+
+/**
+ * `viewportFit: "cover"` is what makes `env(safe-area-inset-*)` report real
+ * values on notched iPhones — without it the bottom action bar sits under the
+ * home indicator. Zoom is deliberately left unrestricted (no maximumScale or
+ * userScalable: false): blocking pinch-to-zoom is an accessibility failure,
+ * and the actual zoom problems are fixed at their source instead.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
