@@ -6,6 +6,7 @@ import {
 } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { DEFAULT_TIMEZONE, buildWhatsAppMessage } from "../lib/quoteMessage";
+import { digitsOf } from "../lib/quoteSpec";
 
 /**
  * Outbound webhook fired when a customer submits a specification.
@@ -76,10 +77,14 @@ export const deliverQuoteWebhook = internalAction({
     });
     if (!quote) return null; // Submission was deleted before we got to it.
 
-    // The summary and nothing else - the receiving automation decides who it
-    // goes to. Still wrapped in JSON under `message` so receivers keep parsing
-    // a JSON body rather than plain text.
+    // The customer's number travels with the summary so the receiving
+    // automation has somewhere to send it. `phone` is exactly what they typed;
+    // `phoneDigits` is the same number stripped of spaces and punctuation for
+    // APIs that require bare digits - it carries a country code only if the
+    // customer typed one.
     const payload = {
+      phone: quote.phone,
+      phoneDigits: digitsOf(quote.phone),
       message: buildWhatsAppMessage(
         quote,
         process.env.QUOTE_TIMEZONE || DEFAULT_TIMEZONE,
