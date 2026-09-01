@@ -235,31 +235,32 @@ submission never fires a webhook.
 
 ### Payload
 
-`message` is the headline field: a WhatsApp-ready summary built by
-`lib/quoteMessage.ts`, using `*bold*` markup. The structured fields are kept
-alongside it for anything that needs individual values.
+The body is the summary and nothing else — a WhatsApp-ready message built by
+`lib/quoteMessage.ts` using `*bold*` markup:
 
 ```json
 {
-  "event": "quote.submitted",
   "message": "*New Quote Request*
 
-*Reference:* PW-20260901-B6RQ
-...",
-  "reference": "PW-20260901-B6RQ",
-  "submittedAt": "2026-09-01T14:30:00.000Z",
-  "customer": { "name": "...", "phone": "...", "email": null },
-  "productType": "Booklet",
-  "quantity": 500,
-  "answers": [{ "key": "...", "label": "...", "value": "..." }],
-  "answersByLabel": { "Ink": "Colour throughout" },
-  "link": { "token": "...", "url": "...", "internalNote": null }
+*Reference:* PW-20260901-QLF5
+*Received:* 01 Sept 2026, 14:30
+
+*Customer*
+• Name: ...
+
+*Job*
+• Product: Booklet
+• Quantity: 500
+..."
 }
 ```
 
-The message deliberately leaves out the internal note and the form URL, on the
-assumption it may be forwarded to the customer. Both remain in `link` for
-internal use.
+It stays wrapped in JSON under `message` rather than being sent as plain text,
+so receivers keep parsing a JSON body. `content-type` is `application/json`,
+and `x-webhook-secret` is added when `QUOTE_WEBHOOK_SECRET` is set.
+
+The message deliberately omits the internal note and the form URL, on the
+assumption it may be forwarded to the customer.
 
 ### Delivery and retries
 
