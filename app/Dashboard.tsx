@@ -4,8 +4,16 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { api } from "@/convex/_generated/api";
-import { Button, Card, FieldShell, controlClass, formatDate } from "@/components/ui";
+import {
+  Button,
+  Card,
+  FieldShell,
+  cn,
+  controlClass,
+  formatDate,
+} from "@/components/ui";
 import { buildFormPath, type Prefill } from "@/lib/prefill";
+import { filterQuotes, isFiltering } from "@/lib/quoteFilter";
 import {
   PRODUCT_TYPES,
   hasErrors,
@@ -94,6 +102,8 @@ export function Dashboard({
   const [created, setCreated] = useState<{ token: string; prefill: Prefill } | null>(
     null,
   );
+  const [search, setSearch] = useState("");
+  const [productFilter, setProductFilter] = useState("");
 
   const origin = useSyncExternalStore(
     subscribeToNothing,
@@ -105,6 +115,25 @@ export function Dashboard({
     () => (token: string, prefill: Prefill) =>
       `${origin}${buildFormPath(token, prefill)}`,
     [origin],
+  );
+
+  /** Only offer products that actually have submissions to filter by. */
+  const productsWithQuotes = useMemo(() => {
+    if (!quotes) return [];
+    return PRODUCT_TYPES.filter((product) =>
+      quotes.some((quote) => quote.productType === product),
+    );
+  }, [quotes]);
+
+  const filter = useMemo(
+    () => ({ search, productType: productFilter }),
+    [search, productFilter],
+  );
+  const filtering = isFiltering(filter);
+
+  const visibleQuotes = useMemo(
+    () => (quotes ? filterQuotes(quotes, filter) : undefined),
+    [quotes, filter],
   );
 
   const liveErrors = useMemo(() => validateLinkInput(form), [form]);
@@ -436,10 +465,53 @@ export function Dashboard({
       <Card>
         <h2 className="mb-4 text-lg font-semibold">
           Submitted specifications{" "}
-          {quotes && (
-            <span className="font-normal text-zinc-500">({quotes.length})</span>
+          {quotes && visibleQuotes && (
+            <span className="font-normal text-zinc-500">
+              {filtering
+                ? `(${visibleQuotes.length} of ${quotes.length})`
+                : `(${quotes.length})`}
+            </span>
           )}
         </h2>
+
+        {quotes && quotes.length > 0 && (
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row">
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search name, phone, reference or answer"
+              aria-label="Search submissions"
+              className={cn(controlClass(false), "sm:flex-1")}
+            />
+            <select
+              value={productFilter}
+              onChange={(event) => setProductFilter(event.target.value)}
+              aria-label="Filter by product"
+              className={cn(controlClass(false), "sm:w-56")}
+            >
+              <option value="">All products</option>
+              {productsWithQuotes.map((product) => (
+                <option key={product} value={product}>
+                  {product}
+                </option>
+              ))}
+            </select>
+            {filtering && (
+              <Button
+                variant="secondary"
+                className="sm:px-5"
+                onClick={() => {
+                  setSearch("");
+                  setProductFilter("");
+                }}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        )}
+
         {quotes === undefined && (
           <p className="text-sm text-zinc-500">Loading…</p>
         )}
@@ -448,8 +520,13 @@ export function Dashboard({
             Nothing submitted yet. Saved specifications will appear here.
           </p>
         )}
+        {visibleQuotes?.length === 0 && quotes && quotes.length > 0 && (
+          <p className="text-sm text-zinc-500">
+            No submissions match that filter.
+          </p>
+        )}
         <div className="space-y-3">
-          {quotes?.map((quote) => (
+          {visibleQuotes?.map((quote) => (
             <details
               key={quote._id}
               className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4"
