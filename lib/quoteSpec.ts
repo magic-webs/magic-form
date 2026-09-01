@@ -608,7 +608,10 @@ export type LinkInput = {
   notes?: string;
 };
 
-/** Validates the three things staff type to mint a link (+ optional extras). */
+/**
+ * Validates what staff type to mint a link. Product type may be left blank —
+ * the customer is then asked to choose it as the first step of the form.
+ */
 export function validateLinkInput(input: LinkInput): Errors {
   const errors: Errors = {};
   const name = validateName(input.customerName);
@@ -617,8 +620,10 @@ export function validateLinkInput(input: LinkInput): Errors {
   if (phone) errors.phone = phone;
   const email = validateEmail(input.email ?? "");
   if (email) errors.email = email;
-  const productType = validateProductType(input.productType);
-  if (productType) errors.productType = productType;
+  if ((input.productType ?? "").trim()) {
+    const productType = validateProductType(input.productType);
+    if (productType) errors.productType = productType;
+  }
   const quantity = validateQuantity(input.quantity ?? "", false);
   if (quantity) errors.quantity = quantity;
   if (clean(input.notes).length > 1000) {
@@ -668,17 +673,26 @@ export const hasErrors = (errors: Errors) => Object.keys(errors).length > 0;
 
 /** One screen of the customer wizard. */
 export type Step =
+  | { id: "product"; kind: "product"; label: string }
   | { id: "contact"; kind: "contact"; label: string }
   | { id: "review"; kind: "review"; label: string }
   | { id: string; kind: "field"; label: string };
 
 /**
- * The wizard asks one thing per screen: contact details, then each visible
- * field in order, then a review. Steps are rebuilt whenever answers change, so
- * a conditional field appears or disappears mid-flow.
+ * The wizard asks one thing per screen: the product type (only when the link
+ * did not fix one), contact details, then each visible field in order, then a
+ * review. Steps are rebuilt whenever answers change, so the product's questions
+ * appear the moment it is chosen and a conditional field can arrive mid-flow.
  */
-export function buildSteps(productType: string, answers: Answers): Step[] {
+export function buildSteps(
+  productType: string,
+  answers: Answers,
+  askProduct = false,
+): Step[] {
   return [
+    ...(askProduct
+      ? [{ id: "product", kind: "product", label: "Product type" } as Step]
+      : []),
     { id: "contact", kind: "contact", label: "Your details" },
     ...visibleFieldKeys(productType, answers).map(
       (key): Step => ({ id: key, kind: "field", label: FIELDS[key].label }),
@@ -694,9 +708,18 @@ export function validateStep(
   contact: ContactInput,
   answers: Answers,
 ): Errors {
+  if (step.kind === "product") {
+    const error = validateProductType(productType);
+    return error ? { productType: error } : {};
+  }
   if (step.kind === "contact") return validateContact(contact);
   if (step.kind === "review") {
-    return { ...validateContact(contact), ...validateAnswers(productType, answers) };
+    const productError = validateProductType(productType);
+    return {
+      ...validateAnswers(productType, answers),
+      ...validateContact(contact),
+      ...(productError ? { productType: productError } : {}),
+    };
   }
   const errors: Errors = {};
   const error = validateField(step.id, answers);

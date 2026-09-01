@@ -17,6 +17,8 @@ import {
 import { readPrefill } from "@/lib/prefill";
 import {
   FIELDS,
+  PRODUCTS,
+  PRODUCT_TYPES,
   buildSteps,
   hasErrors,
   hasOtherOption,
@@ -24,6 +26,7 @@ import {
   otherKey,
   validateAnswers,
   validateContact,
+  validateProductType,
   validateStep,
   type Answers,
   type Errors,
@@ -72,11 +75,15 @@ export function QuoteForm({ token }: { token: string }) {
   // Prefills ride in the query string; the stored link is the fallback.
   const prefill = useMemo(() => readPrefill(searchParams), [searchParams]);
 
+  // Only set when the link left the product open for the customer to pick.
+  const [chosenProduct, setChosenProduct] = useState("");
   const [contactEdits, setContactEdits] = useState<Partial<Contact>>({});
   const [answerEdits, setAnswerEdits] = useState<Answers>({});
   const [serverErrors, setServerErrors] = useState<Errors>({});
   const [revealErrors, setRevealErrors] = useState(false);
-  const [stepId, setStepId] = useState<string>("contact");
+  // Empty means "the first step", whichever that is — the product picker when
+  // the link left the product open, otherwise contact details.
+  const [stepId, setStepId] = useState<string>("");
   const [returnToReview, setReturnToReview] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -105,10 +112,12 @@ export function QuoteForm({ token }: { token: string }) {
     return { ...seeded, ...answerEdits };
   }, [prefill.quantity, linkQuantity, answerEdits]);
 
-  const productType = link?.productType ?? "";
+  const askProduct = link !== undefined && link !== null && !link.productType;
+  const productType = link?.productType ?? chosenProduct;
+  const example = PRODUCTS[productType]?.example ?? "";
   const steps = useMemo(
-    () => buildSteps(productType, answers),
-    [productType, answers],
+    () => buildSteps(productType, answers, askProduct),
+    [productType, answers, askProduct],
   );
 
   const foundIndex = steps.findIndex((entry) => entry.id === stepId);
@@ -186,9 +195,11 @@ export function QuoteForm({ token }: { token: string }) {
 
   async function handleSubmit() {
     if (!link) return;
+    const productError = validateProductType(productType);
     const everything = {
+      ...validateAnswers(productType, answers),
       ...validateContact(contact),
-      ...validateAnswers(link.productType, answers),
+      ...(productError ? { productType: productError } : {}),
     };
     if (hasErrors(everything)) {
       setServerErrors(everything);
@@ -208,6 +219,7 @@ export function QuoteForm({ token }: { token: string }) {
         customerName: contact.customerName,
         phone: contact.phone,
         email: contact.email,
+        productType,
         answers,
       });
       setReference(result.reference);
@@ -272,7 +284,7 @@ export function QuoteForm({ token }: { token: string }) {
             Thanks, {contact.customerName.split(" ")[0]}
           </h1>
           <p className="mb-6 text-zinc-600">
-            Your {link.productType.toLowerCase()} specification has been saved.
+            Your {productType.toLowerCase()} specification has been saved.
             We&apos;ll be in touch on {contact.phone} with your quote.
           </p>
           <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
@@ -410,7 +422,7 @@ export function QuoteForm({ token }: { token: string }) {
       <div className="mb-4">
         <div className="mb-2 flex items-baseline justify-between gap-3">
           <p className="truncate text-sm font-semibold text-zinc-900">
-            {link.productType}
+            {productType || "New quote request"}
           </p>
           <p className="shrink-0 text-xs font-medium text-zinc-500">
             Step {index + 1} of {steps.length}
@@ -435,9 +447,11 @@ export function QuoteForm({ token }: { token: string }) {
               <p className="mt-1.5 mb-5 text-zinc-600">
                 Confirm how we should reach you about this quote.
               </p>
-              <div className="mb-6">
-                <ExampleBox text={link.example} />
-              </div>
+              {example && (
+                <div className="mb-6">
+                  <ExampleBox text={example} />
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div>
@@ -513,6 +527,44 @@ export function QuoteForm({ token }: { token: string }) {
             </>
           )}
 
+          {step.kind === "product" && (
+            <>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                What would you like printed?
+              </h1>
+              <p className="mt-1.5 mb-5 text-zinc-600">
+                Pick a product and we&apos;ll ask only what that job needs.
+              </p>
+              <div
+                role="radiogroup"
+                aria-label="Product type"
+                className="space-y-2.5"
+              >
+                {PRODUCT_TYPES.map((product) => (
+                  <OptionCard
+                    key={product}
+                    name="productType"
+                    label={product}
+                    selected={chosenProduct === product}
+                    invalid={Boolean(errorFor("productType"))}
+                    onSelect={() => {
+                      setChosenProduct(product);
+                      clearServerError("productType");
+                    }}
+                  />
+                ))}
+              </div>
+              {errorFor("productType") && (
+                <ErrorText>{errorFor("productType")}</ErrorText>
+              )}
+              {example && (
+                <div className="mt-5">
+                  <ExampleBox text={example} />
+                </div>
+              )}
+            </>
+          )}
+
           {step.kind === "field" && (
             <>
               <div className="mb-5">
@@ -539,6 +591,23 @@ export function QuoteForm({ token }: { token: string }) {
               </p>
 
               <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200">
+                {askProduct && (
+                  <div className="flex items-start gap-3 p-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                        Product
+                      </p>
+                      <p className="mt-1 text-sm break-words">{productType}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      className="min-h-9 px-3 text-sm"
+                      onClick={() => editFromReview("product")}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                )}
                 <div className="flex items-start gap-3 p-4">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">

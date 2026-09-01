@@ -169,7 +169,8 @@ export function Dashboard({
             Quote request links
           </h1>
           <p className="mt-1.5 text-zinc-600">
-            Name, phone number and product type make a link you can send.
+            Name and phone number make a link you can send. Add a product type
+            to fix the job, or leave it blank and the customer picks it.
           </p>
         </div>
         <Button
@@ -230,8 +231,8 @@ export function Dashboard({
             <FieldShell
               id="productType"
               label="Product type"
-              required
               error={shownError("productType")}
+              hint="Leave blank and the customer picks it on the form."
             >
               <select
                 id="productType"
@@ -241,7 +242,7 @@ export function Dashboard({
                 aria-invalid={Boolean(shownError("productType"))}
                 className={controlClass(Boolean(shownError("productType")))}
               >
-                <option value="">Select product type</option>
+                <option value="">Customer chooses</option>
                 {PRODUCT_TYPES.map((product) => (
                   <option key={product} value={product}>
                     {product}
@@ -374,7 +375,10 @@ export function Dashboard({
                       {link.customerName}
                     </p>
                     <p className="text-xs text-zinc-500">
-                      {link.phone} · {link.productType}
+                      {link.phone} ·{" "}
+                      {link.productType ?? (
+                        <span className="italic">customer chooses</span>
+                      )}
                     </p>
                   </div>
                   <span

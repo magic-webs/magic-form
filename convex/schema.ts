@@ -11,7 +11,8 @@ export default defineSchema({
     customerName: v.string(),
     phone: v.string(),
     email: v.optional(v.string()),
-    productType: v.string(),
+    /** Left unset when the customer is the one who picks the product. */
+    productType: v.optional(v.string()),
     quantity: v.optional(v.number()),
     notes: v.optional(v.string()),
     createdAt: v.number(),
