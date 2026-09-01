@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import {
   buildAnswerRows,
@@ -8,6 +8,7 @@ import {
   validateAnswers,
   validateContact,
   validateLinkInput,
+  validateProductType,
   type Errors,
 } from "../lib/quoteSpec";
 import { isValidSession, requireAdmin } from "./lib/auth";
@@ -46,42 +47,74 @@ const optional = (value: string | undefined) => {
   return trimmed === "" ? undefined : trimmed;
 };
 
+/** Field shape shared by the dashboard mutation and the HTTP API. */
+const linkInputArgs = {
+  customerName: v.string(),
+  phone: v.string(),
+  email: v.optional(v.string()),
+  productType: v.optional(v.string()),
+  quantity: v.optional(v.string()),
+  notes: v.optional(v.string()),
+};
+
+type LinkInputArgs = {
+  customerName: string;
+  phone: string;
+  email?: string;
+  productType?: string;
+  quantity?: string;
+  notes?: string;
+};
+
+/**
+ * Validate and insert a link. Callers are responsible for authorising first:
+ * the dashboard checks an admin session, the HTTP API checks an API key.
+ */
+async function insertQuoteLink(
+  ctx: MutationCtx,
+  args: LinkInputArgs,
+): Promise<{ token: string }> {
+  rejectOnErrors(validateLinkInput({ ...args, productType: args.productType ?? "" }));
+
+  const token = await uniqueToken(ctx);
+  const quantity = optional(args.quantity);
+
+  await ctx.db.insert("quoteLinks", {
+    token,
+    customerName: trim(args.customerName),
+    phone: trim(args.phone),
+    email: optional(args.email),
+    productType: optional(args.productType),
+    quantity: quantity === undefined ? undefined : Number(quantity),
+    notes: optional(args.notes),
+    createdAt: Date.now(),
+    submissionCount: 0,
+  });
+
+  return { token };
+}
+
 /**
  * Mint a shareable link. Staff supply the customer's name, phone number and
  * the product type; everything else on the form is filled in by the customer.
  */
 export const createLink = mutation({
-  args: {
-    sessionToken: v.string(),
-    customerName: v.string(),
-    phone: v.string(),
-    email: v.optional(v.string()),
-    productType: v.string(),
-    quantity: v.optional(v.string()),
-    notes: v.optional(v.string()),
-  },
+  args: { sessionToken: v.string(), ...linkInputArgs },
   returns: v.object({ token: v.string() }),
   handler: async (ctx, args) => {
     await requireAdmin(ctx, args.sessionToken);
-    rejectOnErrors(validateLinkInput(args));
-
-    const token = await uniqueToken(ctx);
-    const quantity = optional(args.quantity);
-
-    await ctx.db.insert("quoteLinks", {
-      token,
-      customerName: trim(args.customerName),
-      phone: trim(args.phone),
-      email: optional(args.email),
-      productType: trim(args.productType),
-      quantity: quantity === undefined ? undefined : Number(quantity),
-      notes: optional(args.notes),
-      createdAt: Date.now(),
-      submissionCount: 0,
-    });
-
-    return { token };
+    return insertQuoteLink(ctx, args);
   },
+});
+
+/**
+ * Same thing for the HTTP API in `convex/http.ts`. Internal, so it is not
+ * reachable from a browser client — the API key is checked before it runs.
+ */
+export const createLinkViaApi = internalMutation({
+  args: linkInputArgs,
+  returns: v.object({ token: v.string() }),
+  handler: async (ctx, args) => insertQuoteLink(ctx, args),
 });
 
 const linkShape = v.object({
@@ -89,7 +122,7 @@ const linkShape = v.object({
   customerName: v.string(),
   phone: v.string(),
   email: v.optional(v.string()),
-  productType: v.string(),
+  productType: v.optional(v.string()),
   quantity: v.optional(v.number()),
   notes: v.optional(v.string()),
   createdAt: v.number(),
@@ -120,7 +153,9 @@ export const getLink = query({
       createdAt: link.createdAt,
       submissionCount: link.submissionCount,
       lastSubmittedAt: link.lastSubmittedAt,
-      example: PRODUCTS[link.productType]?.example ?? "",
+      example: link.productType
+        ? (PRODUCTS[link.productType]?.example ?? "")
+        : "",
     };
   },
 });
@@ -145,6 +180,8 @@ export const submitQuote = mutation({
     customerName: v.string(),
     phone: v.string(),
     email: v.optional(v.string()),
+    /** Only used when the link did not fix a product type. */
+    productType: v.optional(v.string()),
     answers: v.record(v.string(), v.string()),
   },
   returns: v.object({ reference: v.string() }),
@@ -157,9 +194,14 @@ export const submitQuote = mutation({
       throw new ConvexError({ message: "This quote link is no longer valid." });
     }
 
+    // A product fixed on the link always wins; the customer only chooses when
+    // the link left it open.
+    const productType = link.productType ?? trim(args.productType);
+    const productError = validateProductType(productType);
     rejectOnErrors({
+      ...validateAnswers(productType, args.answers),
       ...validateContact(args),
-      ...validateAnswers(link.productType, args.answers),
+      ...(productError ? { productType: productError } : {}),
     });
 
     const createdAt = Date.now();
@@ -172,9 +214,9 @@ export const submitQuote = mutation({
       customerName: trim(args.customerName),
       phone: trim(args.phone),
       email: optional(args.email),
-      productType: link.productType,
+      productType,
       quantity: Number(trim(args.answers.quantity)),
-      answers: buildAnswerRows(link.productType, args.answers),
+      answers: buildAnswerRows(productType, args.answers),
       createdAt,
     });
 
@@ -203,7 +245,7 @@ export const listLinks = query({
       customerName: v.string(),
       phone: v.string(),
       email: v.optional(v.string()),
-      productType: v.string(),
+      productType: v.optional(v.string()),
       quantity: v.optional(v.number()),
       notes: v.optional(v.string()),
       createdAt: v.number(),
