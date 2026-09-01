@@ -76,8 +76,9 @@ export const deliverQuoteWebhook = internalAction({
     });
     if (!quote) return null; // Submission was deleted before we got to it.
 
-    // The summary and nothing else. Still wrapped in JSON under `message` so
-    // receivers keep parsing a JSON body rather than plain text.
+    // The summary and nothing else - the receiving automation decides who it
+    // goes to. Still wrapped in JSON under `message` so receivers keep parsing
+    // a JSON body rather than plain text.
     const payload = {
       message: buildWhatsAppMessage(
         quote,

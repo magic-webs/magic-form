@@ -4,9 +4,11 @@
  * WhatsApp markup is *bold*, _italic_, ```monospace```. Only bold is used —
  * it degrades to visible asterisks anywhere else, which still reads fine.
  *
- * Nothing internal goes in here: the message is written on the assumption it
- * may be forwarded to the customer, so the staff-only note on the link and the
- * form URL are deliberately left out.
+ * It is written to the customer: a confirmation that their request arrived,
+ * plus a read-back of what they asked for so a mistake is easy to spot. No
+ * greeting or sign-off - the sending channel supplies that.
+ *
+ * Nothing internal appears here: no staff note, no form URL, no token.
  */
 
 export type QuoteSummary = {
@@ -50,19 +52,15 @@ export function buildWhatsAppMessage(
 ): string {
   const lines: string[] = [];
 
-  lines.push("*New Quote Request*");
+  lines.push(
+    "Thanks for your quote request. We have got it and will come back to you shortly with a price.",
+  );
   lines.push("");
-  lines.push(`*Reference:* ${quote.reference}`);
+  lines.push(`*Your reference:* ${quote.reference}`);
   lines.push(`*Received:* ${formatQuoteDate(quote.createdAt, timeZone)}`);
   lines.push("");
 
-  lines.push("*Customer*");
-  lines.push(`• Name: ${quote.customerName}`);
-  lines.push(`• Phone: ${quote.phone}`);
-  if (quote.email) lines.push(`• Email: ${quote.email}`);
-  lines.push("");
-
-  lines.push("*Job*");
+  lines.push("*What you asked for*");
   lines.push(`• Product: ${quote.productType}`);
   lines.push(`• Quantity: ${quote.quantity.toLocaleString("en-GB")}`);
   for (const answer of quote.answers) {
@@ -74,7 +72,7 @@ export function buildWhatsAppMessage(
   const additional = quote.answers.find((answer) => answer.key === "additional");
   if (additional?.value) {
     lines.push("");
-    lines.push("*Additional information*");
+    lines.push("*Your notes*");
     lines.push(additional.value);
   }
 
