@@ -22,7 +22,7 @@ export type FieldSpec = {
 };
 
 /** Choosing one of these opens the free-text "please specify" companion input. */
-export const OTHER_TRIGGERS = ["Other please complete", "Please describe"];
+export const OTHER_TRIGGERS = ["Other", "Please describe"];
 
 export function isOtherTrigger(value: string): boolean {
   return OTHER_TRIGGERS.includes(value);
@@ -53,7 +53,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A4", "A5", "Other please complete"],
+    options: ["A4", "A5", "Other"],
   },
   bookletType: {
     label: "Booklet / Brochure Type",
@@ -65,20 +65,20 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Cover Paper Weight",
     type: "select",
     required: true,
-    options: ["250gsm", "300gsm", "350gsm", "Other please complete"],
+    options: ["250gsm", "300gsm", "350gsm", "Other"],
     showIf: { field: "bookletType", equals: "Cover heavier and inner lighter" },
   },
   innerWeight: {
     label: "Inner Paper Weight",
     type: "select",
     required: true,
-    options: ["130gsm", "150gsm", "170gsm", "Other please complete"],
+    options: ["130gsm", "150gsm", "170gsm", "Other"],
   },
   inkBooklet: {
     label: "Ink",
     type: "select",
     required: true,
-    options: ["Black throughout", "Colour throughout", "Other please complete"],
+    options: ["Black throughout", "Colour throughout", "Other"],
   },
   embellishment: {
     label: "Embellishment on Cover Required",
@@ -90,13 +90,13 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A4", "A5", "Other please complete"],
+    options: ["A4", "A5", "Other"],
   },
   paperNewsletter: {
     label: "Paper Weight",
     type: "select",
     required: true,
-    options: ["130gsm", "150gsm", "170gsm", "Other please complete"],
+    options: ["130gsm", "150gsm", "170gsm", "Other"],
   },
   inkNewsletter: {
     label: "Ink",
@@ -108,25 +108,25 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A6", "A5", "Other please complete"],
+    options: ["A6", "A5", "Other"],
   },
   paperPostcard: {
     label: "Paper Weight",
     type: "select",
     required: true,
-    options: ["250gsm", "300gsm", "350gsm", "Other please complete"],
+    options: ["250gsm", "300gsm", "350gsm", "Other"],
   },
   inkPostcard: {
     label: "Ink",
     type: "select",
     required: true,
-    options: ["Colour face only", "Colour throughout", "Other please complete"],
+    options: ["Colour face only", "Colour throughout", "Other"],
   },
   finishFlyer: {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A4", "A5", "A6", "Other please complete"],
+    options: ["A4", "A5", "A6", "Other"],
   },
   paperFlyer: {
     label: "Paper Weight",
@@ -141,7 +141,7 @@ export const FIELDS: Record<string, FieldSpec> = {
       "280gsm",
       "300gsm",
       "350gsm",
-      "Other please complete",
+      "Other",
     ],
   },
   inkFlyer: {
@@ -151,7 +151,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: [
       "Colour face only",
       "Colour face and reverse",
-      "Other please complete",
+      "Other",
     ],
   },
   folded: {
@@ -164,31 +164,31 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A4", "Other please complete"],
+    options: ["A4", "Other"],
   },
   paperLetterhead: {
     label: "Paper Weight",
     type: "select",
     required: true,
-    options: ["100gsm", "120gsm", "Other please complete"],
+    options: ["100gsm", "120gsm", "Other"],
   },
   inkLetterhead: {
     label: "Ink",
     type: "select",
     required: true,
-    options: ["Colour face only", "Other please complete"],
+    options: ["Colour face only", "Other"],
   },
   finishBusinessCard: {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["55 x 85", "Other please complete"],
+    options: ["55 x 85", "Other"],
   },
   paperBusinessCard: {
     label: "Paper Weight",
     type: "select",
     required: true,
-    options: ["450gsm", "Other please complete"],
+    options: ["450gsm", "Other"],
   },
   inkBusinessCard: {
     label: "Ink",
@@ -197,20 +197,20 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: [
       "Colour face only",
       "Colour face and reverse",
-      "Other please complete",
+      "Other",
     ],
   },
   finishFolder: {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A4", "A5", "Other please complete"],
+    options: ["A4", "A5", "Other"],
   },
   paperFolder: {
     label: "Paper Weight",
     type: "select",
     required: true,
-    options: ["300gsm", "350gsm", "Other please complete"],
+    options: ["300gsm", "350gsm", "Other"],
   },
   inkFolder: {
     label: "Ink",
@@ -219,7 +219,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: [
       "Colour face only",
       "Colour face and reverse",
-      "Other please complete",
+      "Other",
     ],
   },
   dieCutting: {
@@ -232,25 +232,25 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["A1", "A2", "A3", "A4", "Other please complete"],
+    options: ["A1", "A2", "A3", "A4", "Other"],
   },
   paperPoster: {
     label: "Paper / Material",
     type: "select",
     required: true,
-    options: ["Poster paper", "Other please complete"],
+    options: ["Poster paper", "Other"],
   },
   finishBanner: {
     label: "Finish Size",
     type: "select",
     required: true,
-    options: ["2M x 1M", "3M x 1M", "4M x 2M", "Other please complete"],
+    options: ["2M x 1M", "3M x 1M", "4M x 2M", "Other"],
   },
   paperBanner: {
     label: "Material",
     type: "select",
     required: true,
-    options: ["440gsm PVC", "Other please complete"],
+    options: ["440gsm PVC", "Other"],
   },
   finishRoller: {
     label: "Finish Size",
@@ -260,14 +260,14 @@ export const FIELDS: Record<string, FieldSpec> = {
       "800mm width x 2000mm height (STD)",
       "850mm width x 2000mm height",
       "1000mm width x 2000mm height",
-      "Other please complete",
+      "Other",
     ],
   },
   labelShape: {
     label: "Finish Shape",
     type: "select",
     required: true,
-    options: ["Circle", "Square", "Rectangle", "Other please complete"],
+    options: ["Circle", "Square", "Rectangle", "Other"],
   },
   labelSize: {
     label: "Size",
