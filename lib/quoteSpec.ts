@@ -50,7 +50,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     ],
   },
   finishBooklet: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A4", "A5", "Other"],
@@ -87,7 +87,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Not required", "Please describe"],
   },
   finishNewsletter: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A4", "A5", "Other"],
@@ -105,7 +105,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Colour throughout"],
   },
   finishPostcard: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A6", "A5", "Other"],
@@ -123,7 +123,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Colour face only", "Colour throughout", "Other"],
   },
   finishFlyer: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A4", "A5", "A6", "Other"],
@@ -158,10 +158,10 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Folded",
     type: "radio",
     required: true,
-    options: ["Yes", "No"],
+    options: ["Single folded", "2 folded"],
   },
   finishLetterhead: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A4", "Other"],
@@ -179,7 +179,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Colour face only", "Other"],
   },
   finishBusinessCard: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["55 x 85", "Other"],
@@ -201,7 +201,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     ],
   },
   finishFolder: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A4", "A5", "Other"],
@@ -229,7 +229,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Interlocking pockets", "Glued pockets"],
   },
   finishPoster: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["A1", "A2", "A3", "A4", "Other"],
@@ -241,7 +241,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Poster paper", "Other"],
   },
   finishBanner: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: ["2M x 1M", "3M x 1M", "4M x 2M", "Other"],
@@ -253,7 +253,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["440gsm PVC", "Other"],
   },
   finishRoller: {
-    label: "Finish Size",
+    label: "Finished Size",
     type: "select",
     required: true,
     options: [
