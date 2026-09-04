@@ -45,7 +45,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     type: "radio",
     required: true,
     options: [
-      "Supplied print ready and bleeds as a PDF",
+      "Supplied print ready with bleeds as a PDF",
       "Printwell to generate the design and artwork",
     ],
   },
@@ -81,7 +81,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     options: ["Black throughout", "Colour throughout", "Other"],
   },
   embellishment: {
-    label: "Embellishment on Cover Required",
+    label: "Embellishment/Special finishing required",
     type: "select",
     required: false,
     options: ["Not required", "Please describe"],
@@ -158,7 +158,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Folded",
     type: "radio",
     required: true,
-    options: ["Single folded", "2 folded"],
+    options: ["No Fold", "Single folded", "2 folded"],
   },
   finishLetterhead: {
     label: "Finished Size",
