@@ -45,7 +45,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     type: "radio",
     required: true,
     options: [
-      "Supplied print ready with bleeds as a PDF",
+      "Supplied print ready with bleed as a PDF",
       "Printwell to generate the design and artwork",
     ],
   },
