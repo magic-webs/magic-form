@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   FieldShell,
+  Tabs,
   cn,
   controlClass,
   formatDate,
@@ -191,28 +192,43 @@ export function Dashboard({
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-      <header className="mb-7 flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Quote request links
-          </h1>
-          <p className="mt-1.5 text-zinc-600">
-            Name and phone number make a link you can send. Add a product type
-            to fix the job, or leave it blank and the customer picks it.
-          </p>
+    <div className="flex h-screen flex-col overflow-hidden bg-zinc-50">
+      <header className="border-b border-zinc-200 bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight">Printwell Quotes</h1>
+          <Button
+            variant="secondary"
+            className="min-h-10 px-4 text-sm"
+            onClick={async () => {
+              await logout({ sessionToken }).catch(() => {});
+              onSignOut();
+            }}
+          >
+            Sign out
+          </Button>
         </div>
-        <Button
-          variant="secondary"
-          className="min-h-10 px-4 text-sm"
-          onClick={async () => {
-            await logout({ sessionToken }).catch(() => {});
-            onSignOut();
-          }}
-        >
-          Sign out
-        </Button>
       </header>
+
+      <Tabs
+        tabs={[
+          { id: "create", label: "Create Link" },
+          { id: "submissions", label: "Submissions" },
+        ]}
+        defaultTab="create"
+      >
+        {(activeTab) => (
+          <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
+            {activeTab === "create" && (
+              <>
+                <div className="mb-7">
+                  <h2 className="text-xl font-semibold tracking-tight">
+                    Create a quote link
+                  </h2>
+                  <p className="mt-1.5 text-sm text-zinc-600">
+                    Name and phone number make a link you can send. Add a product type
+                    to fix the job, or leave it blank and the customer picks it.
+                  </p>
+                </div>
 
       <Card className="mb-6">
         <h2 className="mb-5 text-lg font-semibold">Create a link</h2>
@@ -462,17 +478,20 @@ export function Dashboard({
         </ul>
       </Card>
 
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold">
-          Submitted specifications{" "}
-          {quotes && visibleQuotes && (
-            <span className="font-normal text-zinc-500">
-              {filtering
-                ? `(${visibleQuotes.length} of ${quotes.length})`
-                : `(${quotes.length})`}
-            </span>
-          )}
-        </h2>
+              </>
+            )}
+            {activeTab === "submissions" && (
+              <Card>
+                <h2 className="mb-4 text-lg font-semibold">
+                  Submitted specifications{" "}
+                  {quotes && visibleQuotes && (
+                    <span className="font-normal text-zinc-500">
+                      {filtering
+                        ? `(${visibleQuotes.length} of ${quotes.length})`
+                        : `(${quotes.length})`}
+                    </span>
+                  )}
+                </h2>
 
         {quotes && quotes.length > 0 && (
           <div className="mb-5 flex flex-col gap-3 sm:flex-row">
@@ -582,8 +601,12 @@ export function Dashboard({
               </dl>
             </details>
           ))}
-        </div>
-      </Card>
-    </main>
+                </div>
+              </Card>
+            )}
+          </main>
+        )}
+      </Tabs>
+    </div>
   );
 }

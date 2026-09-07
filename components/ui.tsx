@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 export const cn = (...parts: Array<string | false | null | undefined>) =>
@@ -215,3 +216,50 @@ export const formatDate = (ms: number) =>
     hour: "2-digit",
     minute: "2-digit",
   });
+
+export function Tabs({
+  tabs,
+  defaultTab,
+  onTabChange,
+  children,
+}: {
+  tabs: Array<{ id: string; label: string }>;
+  defaultTab: string;
+  onTabChange?: (tabId: string) => void;
+  children: (activeTab: string) => ReactNode;
+}) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    onTabChange?.(tabId);
+  };
+
+  return (
+    <div className="flex h-screen flex-col overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-48 border-r border-zinc-200 bg-white">
+          <nav className="space-y-1 p-4">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  "w-full rounded-lg px-4 py-2 text-left text-sm font-medium transition",
+                  activeTab === tab.id
+                    ? "bg-zinc-900 text-white"
+                    : "text-zinc-600 hover:bg-zinc-50",
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="flex-1 overflow-auto">
+          {children(activeTab)}
+        </div>
+      </div>
+    </div>
+  );
+}
