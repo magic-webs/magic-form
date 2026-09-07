@@ -60,33 +60,33 @@ export function DashboardPage({
   const recentLinks = links?.slice(0, 5).reverse() ?? [];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
+        <p className="mt-1 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
           Welcome back. Here's an overview of your quote requests.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.title} className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
+            <Card key={stat.title} className="p-3 sm:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground sm:text-sm">
                     {stat.title}
                   </p>
-                  <p className="mt-2 text-3xl font-bold">{stat.value}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-1 text-2xl font-bold sm:mt-2 sm:text-3xl">{stat.value}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1 sm:mt-1 sm:line-clamp-none">
                     {stat.description}
                   </p>
                 </div>
-                <div className={`rounded-lg p-2 ${stat.color}`}>
-                  <Icon className={`h-6 w-6 ${stat.iconColor}`} />
+                <div className={`shrink-0 rounded-lg p-1.5 sm:p-2 ${stat.color}`}>
+                  <Icon className={`h-4 w-4 sm:h-6 sm:w-6 ${stat.iconColor}`} />
                 </div>
               </div>
             </Card>
@@ -95,10 +95,10 @@ export function DashboardPage({
       </div>
 
       {/* Recent Activity */}
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:gap-8 grid-cols-1 md:grid-cols-2">
         {/* Recent Links */}
-        <Card className="p-6">
-          <h2 className="mb-4 text-lg font-semibold">Recent Links</h2>
+        <Card className="p-4 sm:p-6">
+          <h2 className="mb-3 text-base font-semibold sm:mb-4 sm:text-lg">Recent Links</h2>
           <div className="space-y-3">
             {recentLinks.length === 0 ? (
               <p className="text-sm text-muted-foreground">No links yet</p>
@@ -133,8 +133,8 @@ export function DashboardPage({
         </Card>
 
         {/* Recent Submissions */}
-        <Card className="p-6">
-          <h2 className="mb-4 text-lg font-semibold">Recent Submissions</h2>
+        <Card className="p-4 sm:p-6">
+          <h2 className="mb-3 text-base font-semibold sm:mb-4 sm:text-lg">Recent Submissions</h2>
           <div className="space-y-3">
             {recentSubmissions.length === 0 ? (
               <p className="text-sm text-muted-foreground">

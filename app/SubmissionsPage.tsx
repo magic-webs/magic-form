@@ -39,76 +39,76 @@ export function SubmissionsPage({
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Submissions</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Submissions</h1>
+        <p className="mt-1 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
           Review all customer quote specifications and their webhook status.
         </p>
       </div>
 
       {/* Stats Cards */}
       {quotes && (
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{quotes.length}</p>
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+          <Card className="p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground sm:text-sm">Total</p>
+                <p className="text-xl font-bold sm:text-2xl">{quotes.length}</p>
               </div>
-              <CheckCircle2 className="h-8 w-8 text-muted-foreground" />
+              <CheckCircle2 className="h-6 w-6 shrink-0 text-muted-foreground sm:h-8 sm:w-8" />
             </div>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">
+          <Card className="p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground sm:text-sm">Pending</p>
+                <p className="text-xl font-bold sm:text-2xl">
                   {
                     quotes.filter((q) => q.webhookStatus === "pending").length
                   }
                 </p>
               </div>
-              <Clock className="h-8 w-8 text-amber-600" />
+              <Clock className="h-6 w-6 shrink-0 text-amber-600 sm:h-8 sm:w-8" />
             </div>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Failed</p>
-                <p className="text-2xl font-bold">
+          <Card className="p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground sm:text-sm">Failed</p>
+                <p className="text-xl font-bold sm:text-2xl">
                   {
                     quotes.filter((q) => q.webhookStatus === "failed").length
                   }
                 </p>
               </div>
-              <AlertCircle className="h-8 w-8 text-red-600" />
+              <AlertCircle className="h-6 w-6 shrink-0 text-red-600 sm:h-8 sm:w-8" />
             </div>
           </Card>
         </div>
       )}
 
       {/* Filters */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         {quotes && quotes.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex gap-3">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search name, phone, reference or answer…"
+                  placeholder="Search…"
                   aria-label="Search submissions"
-                  className={cn(controlClass(false), "pl-10")}
+                  className={cn(controlClass(false), "pl-10 text-sm")}
                 />
               </div>
               <select
                 value={productFilter}
                 onChange={(event) => setProductFilter(event.target.value)}
                 aria-label="Filter by product"
-                className={cn(controlClass(false), "w-56")}
+                className={cn(controlClass(false), "w-full sm:w-56 text-sm")}
               >
                 <option value="">All products</option>
                 {productsWithQuotes.map((product) => (
@@ -124,6 +124,7 @@ export function SubmissionsPage({
                     setSearch("");
                     setProductFilter("");
                   }}
+                  className="w-full sm:w-auto"
                 >
                   Clear
                 </Button>
@@ -160,33 +161,33 @@ export function SubmissionsPage({
           {visibleQuotes?.map((quote) => (
             <details
               key={quote._id}
-              className="group rounded-lg border border-border bg-muted/40 p-4 transition-colors hover:bg-muted/60"
+              className="group rounded-lg border border-border bg-muted/40 p-3 sm:p-4 transition-colors hover:bg-muted/60"
             >
-              <summary className="flex cursor-pointer flex-col gap-3 list-none">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex-1">
-                    <p className="font-semibold">{quote.customerName}</p>
-                    <p className="text-xs text-muted-foreground">
+              <summary className="flex cursor-pointer flex-col gap-2 sm:gap-3 list-none">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate sm:text-base">{quote.customerName}</p>
+                    <p className="text-xs text-muted-foreground truncate">
                       {quote.productType} • Qty{" "}
                       {quote.quantity.toLocaleString("en-GB")}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1 sm:gap-2 shrink-0">
                     {quote.webhookStatus === "failed" && (
-                      <Badge variant="destructive">Failed</Badge>
+                      <Badge variant="destructive" className="text-xs">Failed</Badge>
                     )}
                     {quote.webhookStatus === "pending" && (
-                      <Badge variant="outline">Pending</Badge>
+                      <Badge variant="outline" className="text-xs">Pending</Badge>
                     )}
                     {quote.webhookStatus === "sent" && (
-                      <Badge>Sent</Badge>
+                      <Badge className="text-xs">Sent</Badge>
                     )}
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span className="font-mono">{quote.reference}</span>
-                  <span>•</span>
-                  <span>{formatDate(quote.createdAt)}</span>
+                  <span className="font-mono truncate">{quote.reference}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="truncate">{formatDate(quote.createdAt)}</span>
                 </div>
               </summary>
 

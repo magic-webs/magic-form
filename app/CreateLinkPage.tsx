@@ -164,21 +164,21 @@ export function CreateLinkPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Create Link</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Create Link</h1>
+        <p className="mt-1 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
           Generate a shareable quote form link for your customers. Optionally
           prefill with product type and details.
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-3">
         {/* Form Section */}
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="mb-6 text-lg font-semibold">Link Details</h2>
+        <Card className="p-4 sm:p-6 lg:col-span-2">
+          <h2 className="mb-4 text-base font-semibold sm:mb-6 sm:text-lg">Link Details</h2>
           <form onSubmit={handleSubmit} noValidate>
-            <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div className="grid gap-3 sm:gap-5 gap-y-4 grid-cols-1 sm:grid-cols-2">
             <FieldShell
               id="customerName"
               label="Customer name"
@@ -353,8 +353,8 @@ export function CreateLinkPage({
       </div>
 
       {/* All Issued Links */}
-      <Card className="p-6">
-        <div className="mb-6 flex items-center justify-between">
+      <Card className="p-4 sm:p-6">
+        <div className="mb-4 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">All Links</h2>
             <p className="mt-1 text-sm text-muted-foreground">
