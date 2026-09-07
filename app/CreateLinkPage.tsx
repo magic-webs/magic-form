@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
-  Button,
-  Card,
   FieldShell,
   cn,
   controlClass,
@@ -20,6 +21,7 @@ import {
   type Errors,
   type LinkInput,
 } from "@/lib/quoteSpec";
+import { Copy, ExternalLink, Trash2 } from "lucide-react";
 
 const EMPTY: LinkInput = {
   customerName: "",
@@ -162,18 +164,21 @@ export function CreateLinkPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold">Create a link</h2>
-        <p className="mt-1 text-sm text-zinc-600">
-          Name and phone number make a link you can send. Add a product type
-          to fix the job, or leave it blank and the customer picks it.
+        <h1 className="text-3xl font-bold tracking-tight">Create Link</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Generate a shareable quote form link for your customers. Optionally
+          prefill with product type and details.
         </p>
       </div>
 
-      <Card>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="grid gap-x-5 sm:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Form Section */}
+        <Card className="p-6 lg:col-span-2">
+          <h2 className="mb-6 text-lg font-semibold">Link Details</h2>
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
             <FieldShell
               id="customerName"
               label="Customer name"
@@ -291,55 +296,81 @@ export function CreateLinkPage({
             </FieldShell>
           </div>
 
-          {formError && (
-            <p role="alert" className="mb-4 text-sm font-medium text-red-600">
-              {formError}
-            </p>
+            {formError && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
+                <p role="alert" className="text-sm font-medium text-red-800">
+                  {formError}
+                </p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="w-full"
+            >
+              {submitting ? "Generating…" : "Generate form link"}
+            </Button>
+          </form>
+        </Card>
+
+        {/* Recently Created */}
+        <div className="space-y-4">
+          {created && (
+            <Card className="border-emerald-200 bg-emerald-50 p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-semibold text-emerald-900">Link Ready!</h3>
+                <Badge className="bg-emerald-600">Success</Badge>
+              </div>
+              <div className="space-y-3">
+                <div className="rounded-lg border border-emerald-200 bg-white p-3">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    Share this link:
+                  </p>
+                  <code className="block overflow-x-auto break-all whitespace-pre-wrap font-mono text-xs text-foreground">
+                    {urlFor(created.token, created.prefill)}
+                  </code>
+                </div>
+                <div className="flex gap-2">
+                  <CopyButton
+                    value={urlFor(created.token, created.prefill)}
+                    label="Copy link"
+                  />
+                  <a
+                    href={buildFormPath(created.token, created.prefill)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Open form
+                  </a>
+                </div>
+              </div>
+            </Card>
           )}
+        </div>
+      </div>
 
-          <Button type="submit" disabled={submitting} className="w-full sm:w-auto sm:px-8">
-            {submitting ? "Generating…" : "Generate form link"}
-          </Button>
-        </form>
-
-        {created && (
-          <div className="mt-6 rounded-xl border border-emerald-300 bg-emerald-50 p-4">
-            <p className="mb-2 text-sm font-semibold text-emerald-900">
-              Link ready — send this to the customer
+      {/* All Issued Links */}
+      <Card className="p-6">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">All Links</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {links?.length ?? 0} link{links?.length !== 1 ? "s" : ""} created
             </p>
-            <code className="mb-3 block overflow-x-auto whitespace-nowrap rounded-lg border border-emerald-200 bg-white px-3 py-2.5 font-mono text-xs">
-              {urlFor(created.token, created.prefill)}
-            </code>
-            <div className="flex flex-wrap gap-2">
-              <CopyButton
-                value={urlFor(created.token, created.prefill)}
-                label="Copy link"
-              />
-              <a
-                href={buildFormPath(created.token, created.prefill)}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center rounded-xl bg-zinc-900 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800"
-              >
-                Open form
-              </a>
-            </div>
           </div>
+        </div>
+        {links === undefined && (
+          <p className="text-sm text-muted-foreground">Loading…</p>
         )}
-      </Card>
-
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold">
-          Issued links{" "}
-          {links && (
-            <span className="font-normal text-zinc-500">({links.length})</span>
-          )}
-        </h2>
-        {links === undefined && <p className="text-sm text-zinc-500">Loading…</p>}
         {links?.length === 0 && (
-          <p className="text-sm text-zinc-500">No links yet.</p>
+          <p className="text-sm text-muted-foreground">
+            No links yet. Create your first link above.
+          </p>
         )}
-        <ul className="space-y-3">
+        <div className="space-y-3">
           {links?.map((link) => {
             const prefill: Prefill = {
               customerName: link.customerName,
@@ -350,52 +381,48 @@ export function CreateLinkPage({
             };
             const url = urlFor(link.token, prefill);
             return (
-              <li
+              <div
                 key={link._id}
-                className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4"
+                className="rounded-lg border border-border bg-muted/40 p-4"
               >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-semibold break-words">
-                      {link.customerName}
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      {link.phone} ·{" "}
-                      {link.productType ?? (
-                        <span className="italic">customer chooses</span>
-                      )}
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <p className="font-semibold">{link.customerName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {link.phone} • {link.productType || "Any product"}
                     </p>
                   </div>
-                  <span
-                    className={
-                      link.submissionCount > 0
-                        ? "shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800"
-                        : "shrink-0 rounded-full bg-zinc-200 px-2.5 py-1 text-xs font-semibold text-zinc-600"
+                  <Badge
+                    variant={
+                      link.submissionCount > 0 ? "default" : "secondary"
                     }
                   >
                     {link.submissionCount > 0
                       ? `${link.submissionCount} received`
                       : "Awaiting"}
-                  </span>
+                  </Badge>
                 </div>
 
-                <code className="mt-3 block overflow-x-auto whitespace-nowrap rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-xs text-zinc-600">
-                  {url}
-                </code>
+                <div className="mb-3 rounded-md border border-border bg-background p-2">
+                  <code className="break-all text-xs text-muted-foreground">
+                    {url}
+                  </code>
+                </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap gap-2">
                   <CopyButton value={url} />
                   <a
                     href={buildFormPath(link.token, prefill)}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex min-h-10 items-center rounded-xl border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+                    className="inline-flex min-h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium transition hover:bg-muted"
                   >
+                    <ExternalLink className="h-4 w-4" />
                     Open
                   </a>
                   <Button
-                    variant="danger"
-                    className="min-h-10 px-3 text-sm"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       const warning =
                         link.submissionCount > 0
@@ -405,17 +432,18 @@ export function CreateLinkPage({
                         void removeLink({ sessionToken, linkId: link._id });
                       }
                     }}
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                   >
-                    Delete
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                  <span className="ml-auto text-xs text-zinc-500">
+                  <span className="ml-auto text-xs text-muted-foreground">
                     {formatDate(link.createdAt)}
                   </span>
                 </div>
-              </li>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </Card>
     </div>
   );
