@@ -84,7 +84,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Embellishment/Special finishing required",
     type: "select",
     required: false,
-    options: ["Not required", "Please describe"],
+    options: ["NO", "Please describe"],
   },
   finishNewsletter: {
     label: "Finished Size",
@@ -188,7 +188,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Paper Weight",
     type: "select",
     required: true,
-    options: ["450gsm", "Other"],
+    options: ["350gsm uncoated", "450gsm silk"],
   },
   inkBusinessCard: {
     label: "Ink",
@@ -267,7 +267,7 @@ export const FIELDS: Record<string, FieldSpec> = {
     label: "Finish Shape",
     type: "select",
     required: true,
-    options: ["Circle", "Square", "Rectangle", "Other"],
+    options: ["Circle", "Square", "Rectangle", "Custom shape"],
   },
   labelSize: {
     label: "Size",
@@ -339,7 +339,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "artwork",
       "finishNewsletter",
       "paperNewsletter",
-      "inkNewsletter",
       "embellishment",
       "additional",
       "quantity",
@@ -417,7 +416,7 @@ export const PRODUCTS: Record<string, ProductSpec> = {
   },
   Banner: {
     example: "2M x 1M printed 4 colour on face on white 440gsm PVC.",
-    fields: ["artwork", "finishBanner", "paperBanner", "additional", "quantity"],
+    fields: ["artwork", "finishBanner", "additional", "quantity"],
   },
   "Roller Banner": {
     example:
