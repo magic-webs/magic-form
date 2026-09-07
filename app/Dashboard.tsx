@@ -52,10 +52,14 @@ export function Dashboard({
 
         <div className="flex flex-1 overflow-hidden">
           <Sidebar>
-            <SidebarHeader>Navigation</SidebarHeader>
+            <SidebarHeader className="border-b">
+              <div className="flex items-center gap-2">
+                <LayoutDashboard className="h-5 w-5" />
+                <span className="font-semibold">Printwell</span>
+              </div>
+            </SidebarHeader>
             <SidebarContent>
               <SidebarGroup>
-                <SidebarGroupLabel>Navigation</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     <SidebarMenuItem>
