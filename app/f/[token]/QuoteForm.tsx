@@ -421,7 +421,7 @@ export function QuoteForm({ token }: { token: string }) {
     <Screen>
       <div className="mb-4">
         <div className="mb-2 flex items-baseline justify-between gap-3">
-          <p className="truncate text-sm font-semibold text-zinc-900">
+          <p className="truncate text-xl font-semibold text-zinc-900">
             {productType || "New quote request"}
           </p>
           <p className="shrink-0 text-xs font-medium text-zinc-500">
