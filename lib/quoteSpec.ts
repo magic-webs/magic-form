@@ -401,7 +401,7 @@ export const PRODUCTS: Record<string, ProductSpec> = {
   "Roller Banner": {
     example:
       "800mm wide x 2000mm height printed 4 colour on face on a roller banner.",
-    fields: ["artwork", "finishRoller", "additional", "quantity"],
+    fields: ["artwork", "finishRoller", "additional"],
   },
   "Labels/Stickers": {
     example:
@@ -417,7 +417,7 @@ export const PRODUCTS: Record<string, ProductSpec> = {
   "Promotion Items, garments": {
     example:
       "Please provide details about the promotional item or garment required.",
-    fields: ["additional", "quantity"],
+    fields: ["additional"],
   },
 };
 
