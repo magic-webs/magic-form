@@ -83,7 +83,6 @@ const createLink = httpAction(async (ctx, request) => {
       phone: asText(body.phone) ?? "",
       productType: asText(body.productType),
       email: asText(body.email),
-      quantity: asText(body.quantity),
       notes: asText(body.notes),
     });
 
@@ -91,7 +90,6 @@ const createLink = httpAction(async (ctx, request) => {
       customerName: asText(body.customerName),
       phone: asText(body.phone),
       email: asText(body.email),
-      quantity: asText(body.quantity),
     });
     const base = process.env.APP_BASE_URL?.replace(/\/+$/, "");
 

@@ -289,14 +289,6 @@ export const FIELDS: Record<string, FieldSpec> = {
     placeholder: "Please provide any additional information",
     maxLength: 2000,
   },
-  quantity: {
-    label: "Quantity Required",
-    type: "number",
-    required: true,
-    placeholder: "Enter quantity",
-    min: 1,
-    max: MAX_QUANTITY,
-  },
 };
 
 export type ProductSpec = { example: string; fields: string[] };
@@ -314,7 +306,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "inkBooklet",
       "embellishment",
       "additional",
-      "quantity",
     ],
   },
   Brochures: {
@@ -329,7 +320,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "inkBooklet",
       "embellishment",
       "additional",
-      "quantity",
     ],
   },
   Newsletter: {
@@ -341,7 +331,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "paperNewsletter",
       "embellishment",
       "additional",
-      "quantity",
     ],
   },
   Postcards: {
@@ -353,7 +342,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "paperPostcard",
       "inkPostcard",
       "additional",
-      "quantity",
     ],
   },
   "Flyers, Leaflets, Folded Leaflets": {
@@ -366,7 +354,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "inkFlyer",
       "folded",
       "additional",
-      "quantity",
     ],
   },
   Letterheads: {
@@ -377,7 +364,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "paperLetterhead",
       "inkLetterhead",
       "additional",
-      "quantity",
     ],
   },
   "Business Cards": {
@@ -388,7 +374,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "paperBusinessCard",
       "inkBusinessCard",
       "additional",
-      "quantity",
     ],
   },
   "Presentation Folders": {
@@ -401,7 +386,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "inkFolder",
       "dieCutting",
       "additional",
-      "quantity",
     ],
   },
   Posters: {
@@ -411,12 +395,11 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "finishPoster",
       "paperPoster",
       "additional",
-      "quantity",
     ],
   },
   Banner: {
     example: "2M x 1M printed 4 colour on face on white 440gsm PVC.",
-    fields: ["artwork", "finishBanner", "additional", "quantity"],
+    fields: ["artwork", "finishBanner", "additional"],
   },
   "Roller Banner": {
     example:
@@ -432,7 +415,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "labelSize",
       "labelType",
       "additional",
-      "quantity",
     ],
   },
   "Promotion Items, Garments": {
@@ -583,27 +565,11 @@ export function validateProductType(value: string): string | null {
   return null;
 }
 
-export function validateQuantity(
-  value: string,
-  required: boolean,
-): string | null {
-  const quantity = clean(value);
-  if (!quantity) return required ? "Quantity is required." : null;
-  if (!/^\d+$/.test(quantity)) return "Quantity must be a whole number.";
-  const parsed = Number(quantity);
-  if (parsed < 1) return "Quantity must be at least 1.";
-  if (parsed > MAX_QUANTITY) {
-    return `Quantity cannot exceed ${MAX_QUANTITY.toLocaleString("en-GB")}.`;
-  }
-  return null;
-}
-
 export type LinkInput = {
   customerName: string;
   phone: string;
   email?: string;
   productType: string;
-  quantity?: string;
   notes?: string;
 };
 
@@ -623,8 +589,6 @@ export function validateLinkInput(input: LinkInput): Errors {
     const productType = validateProductType(input.productType);
     if (productType) errors.productType = productType;
   }
-  const quantity = validateQuantity(input.quantity ?? "", false);
-  if (quantity) errors.quantity = quantity;
   if (clean(input.notes).length > 1000) {
     errors.notes = "Notes must be 1000 characters or fewer.";
   }

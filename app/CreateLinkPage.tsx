@@ -28,7 +28,6 @@ const EMPTY: LinkInput = {
   phone: "",
   email: "",
   productType: "",
-  quantity: "",
   notes: "",
 };
 
@@ -148,7 +147,6 @@ export function CreateLinkPage({
           customerName: form.customerName,
           phone: form.phone,
           email: form.email,
-          quantity: form.quantity,
         },
       });
       setForm(EMPTY);
@@ -239,24 +237,6 @@ export function CreateLinkPage({
                   </option>
                 ))}
               </select>
-            </FieldShell>
-
-            <FieldShell
-              id="quantity"
-              label="Quantity"
-              error={shownError("quantity")}
-              hint="Optional — prefills the form."
-            >
-              <input
-                id="quantity"
-                inputMode="numeric"
-                value={form.quantity ?? ""}
-                onChange={(event) => update("quantity", event.target.value)}
-                onBlur={() => blur("quantity")}
-                aria-invalid={Boolean(shownError("quantity"))}
-                className={controlClass(Boolean(shownError("quantity")))}
-                placeholder="500"
-              />
             </FieldShell>
 
             <FieldShell
@@ -376,8 +356,6 @@ export function CreateLinkPage({
               customerName: link.customerName,
               phone: link.phone,
               email: link.email,
-              quantity:
-                link.quantity === undefined ? undefined : String(link.quantity),
             };
             const url = urlFor(link.token, prefill);
             return (

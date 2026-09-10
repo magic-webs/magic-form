@@ -102,15 +102,9 @@ export function QuoteForm({ token }: { token: string }) {
     [contactEdits, prefill, link],
   );
 
-  const linkQuantity = link?.quantity;
   const answers = useMemo<Answers>(() => {
-    const seededQuantity =
-      prefill.quantity ??
-      (linkQuantity === undefined ? undefined : String(linkQuantity));
-    const seeded: Answers =
-      seededQuantity === undefined ? {} : { quantity: seededQuantity };
-    return { ...seeded, ...answerEdits };
-  }, [prefill.quantity, linkQuantity, answerEdits]);
+    return { ...answerEdits };
+  }, [answerEdits]);
 
   const askProduct = link !== undefined && link !== null && !link.productType;
   const productType = link?.productType ?? chosenProduct;

@@ -13,7 +13,6 @@ export default defineSchema({
     email: v.optional(v.string()),
     /** Left unset when the customer is the one who picks the product. */
     productType: v.optional(v.string()),
-    quantity: v.optional(v.number()),
     notes: v.optional(v.string()),
     createdAt: v.number(),
     submissionCount: v.number(),
@@ -29,7 +28,7 @@ export default defineSchema({
     phone: v.string(),
     email: v.optional(v.string()),
     productType: v.string(),
-    quantity: v.number(),
+    quantity: v.optional(v.number()),
     answers: v.array(
       v.object({ key: v.string(), label: v.string(), value: v.string() }),
     ),

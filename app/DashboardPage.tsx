@@ -151,8 +151,7 @@ export function DashboardPage({
                       {quote.customerName}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {quote.productType} • Qty{" "}
-                      {quote.quantity.toLocaleString("en-GB")}
+                      {quote.productType}
                     </p>
                   </div>
                   {quote.webhookStatus === "failed" && (

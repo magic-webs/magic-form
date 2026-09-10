@@ -18,7 +18,7 @@ export type QuoteSummary = {
   phone: string;
   email?: string;
   productType: string;
-  quantity: number;
+  quantity?: number;
   answers: Array<{ key: string; label: string; value: string }>;
 };
 
@@ -62,7 +62,6 @@ export function buildWhatsAppMessage(
 
   lines.push("*What you asked for*");
   lines.push(`• Product: ${quote.productType}`);
-  lines.push(`• Quantity: ${quote.quantity.toLocaleString("en-GB")}`);
   for (const answer of quote.answers) {
     if (SPECIAL_KEYS.has(answer.key)) continue;
     if (!answer.value) continue;

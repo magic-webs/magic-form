@@ -168,8 +168,7 @@ export function SubmissionsPage({
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-sm truncate sm:text-base">{quote.customerName}</p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {quote.productType} • Qty{" "}
-                      {quote.quantity.toLocaleString("en-GB")}
+                      {quote.productType}
                     </p>
                   </div>
                   <div className="flex gap-1 sm:gap-2 shrink-0">

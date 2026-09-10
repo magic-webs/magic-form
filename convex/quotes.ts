@@ -54,7 +54,6 @@ const linkInputArgs = {
   phone: v.string(),
   email: v.optional(v.string()),
   productType: v.optional(v.string()),
-  quantity: v.optional(v.string()),
   notes: v.optional(v.string()),
 };
 
@@ -63,7 +62,6 @@ type LinkInputArgs = {
   phone: string;
   email?: string;
   productType?: string;
-  quantity?: string;
   notes?: string;
 };
 
@@ -78,7 +76,6 @@ async function insertQuoteLink(
   rejectOnErrors(validateLinkInput({ ...args, productType: args.productType ?? "" }));
 
   const token = await uniqueToken(ctx);
-  const quantity = optional(args.quantity);
 
   await ctx.db.insert("quoteLinks", {
     token,
@@ -86,7 +83,6 @@ async function insertQuoteLink(
     phone: trim(args.phone),
     email: optional(args.email),
     productType: optional(args.productType),
-    quantity: quantity === undefined ? undefined : Number(quantity),
     notes: optional(args.notes),
     createdAt: Date.now(),
     submissionCount: 0,
@@ -124,7 +120,6 @@ const linkShape = v.object({
   phone: v.string(),
   email: v.optional(v.string()),
   productType: v.optional(v.string()),
-  quantity: v.optional(v.number()),
   notes: v.optional(v.string()),
   createdAt: v.number(),
   submissionCount: v.number(),
@@ -149,7 +144,6 @@ export const getLink = query({
       phone: link.phone,
       email: link.email,
       productType: link.productType,
-      quantity: link.quantity,
       notes: link.notes,
       createdAt: link.createdAt,
       submissionCount: link.submissionCount,
@@ -216,7 +210,6 @@ export const submitQuote = mutation({
       phone: trim(args.phone),
       email: optional(args.email),
       productType,
-      quantity: Number(trim(args.answers.quantity)),
       answers: buildAnswerRows(productType, args.answers),
       createdAt,
       webhookStatus: "pending",
@@ -257,7 +250,6 @@ export const listLinks = query({
       phone: v.string(),
       email: v.optional(v.string()),
       productType: v.optional(v.string()),
-      quantity: v.optional(v.number()),
       notes: v.optional(v.string()),
       createdAt: v.number(),
       submissionCount: v.number(),
@@ -275,7 +267,6 @@ export const listLinks = query({
       phone: link.phone,
       email: link.email,
       productType: link.productType,
-      quantity: link.quantity,
       notes: link.notes,
       createdAt: link.createdAt,
       submissionCount: link.submissionCount,
@@ -298,7 +289,7 @@ export const listQuotes = query({
       phone: v.string(),
       email: v.optional(v.string()),
       productType: v.string(),
-      quantity: v.number(),
+      quantity: v.optional(v.number()),
       answers: v.array(
         v.object({ key: v.string(), label: v.string(), value: v.string() }),
       ),

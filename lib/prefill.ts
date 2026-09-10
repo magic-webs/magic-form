@@ -13,14 +13,12 @@ export const PREFILL_PARAMS = {
   customerName: "name",
   phone: "phone",
   email: "email",
-  quantity: "qty",
 } as const;
 
 export type Prefill = {
   customerName?: string;
   phone?: string;
   email?: string;
-  quantity?: string;
 };
 
 /** Generous caps: enough for any real value, short enough to bound the URL. */
@@ -28,7 +26,6 @@ const LIMITS: Record<keyof Prefill, number> = {
   customerName: 80,
   phone: 25,
   email: 200,
-  quantity: 7,
 };
 
 type ParamReader = { get(name: string): string | null };
