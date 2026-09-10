@@ -329,7 +329,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "artwork",
       "finishNewsletter",
       "paperNewsletter",
-      "embellishment",
       "additional",
     ],
   },
@@ -340,7 +339,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "artwork",
       "finishPostcard",
       "paperPostcard",
-      "inkPostcard",
       "additional",
     ],
   },
@@ -393,11 +391,10 @@ export const PRODUCTS: Record<string, ProductSpec> = {
     fields: [
       "artwork",
       "finishPoster",
-      "paperPoster",
       "additional",
     ],
   },
-  Banner: {
+  Banners: {
     example: "2M x 1M printed 4 colour on face on white 440gsm PVC.",
     fields: ["artwork", "finishBanner", "additional"],
   },
@@ -417,7 +414,7 @@ export const PRODUCTS: Record<string, ProductSpec> = {
       "additional",
     ],
   },
-  "Promotion Items, Garments": {
+  "Promotion Items, garments": {
     example:
       "Please provide details about the promotional item or garment required.",
     fields: ["additional", "quantity"],
